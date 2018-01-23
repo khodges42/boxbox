@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, redirect
 import os, json, atexit
 from flask_socketio import SocketIO
+from riven_middleware.riven import *
+
 
 try:  
     app = Flask(__name__)
-    from riven import Riven
     r = Riven()
-    s = sched.schedule(time.time, time.sleep)
     app.config['SECRET_KEY'] = 'secret!'
     socketio = SocketIO(app)
 

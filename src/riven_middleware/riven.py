@@ -1,46 +1,46 @@
 import docker, time, json, datetime, sched, threading
+import dateutil.parser
 
 class Riven:
     def __init__(self):
         self.boxes = json.load(open("config/boxes.json"))
         self.config = json.load(open("config/config.json"))
+        
         self.client = docker.from_env()
         self.nodes={}
-        self.t = threading.Thread(target=self.schedule_node_check, args = ())
         self.s = sched.scheduler(time.time, time.sleep)
+
+        self.t = threading.Thread(target=self.schedule_node_check, args = ())
         self.t.daemon = True
         self.t.start()
-        #self.schedule_node_check()
-        #s.enter(10, 1, node_check)
-        #s.run()
+
 
     def schedule_node_check(self):
-        print "sched"
         self.s.enter(5, 1, self.node_check, ())
         self.s.run()
         
     def node_check(self):
-        print "check"
-        for node in self.nodes:
-            if datetime.datetime.strptime(self.nodes[node]["last_seen"]) < datetime.datetime.now()-datetime.timedelta(seconds=30):
+        print "There are {} active containers".format(len(self.nodes))
+        for node in self.nodes.copy():
+            if dateutil.parser.parse(self.nodes[node]["last_seen"]) < datetime.datetime.now()-datetime.timedelta(seconds=15):
+                print "{} is old. Killing Container.".format(node)
                 self.kill_node(node)
         self.schedule_node_check()
-
-            #if lastplus.date < datetime.datetime.now()-datetime.timedelta(seconds=20):
         
     def is_awake(self, box):
         if box in self.nodes:
-            self.nodes[box]["last_seen"] = str(datetime.datetime.now().time())
+            timestamp = datetime.datetime.now().isoformat()
+            self.nodes[box]["last_seen"] = timestamp
             print self.nodes[box]
         
     def new_node(self, box):
         if box in self.boxes:
             port = self.find_new_node_port()
             node_id = "{}{}".format(self.boxes[box]["container"], port)
-            box_info = {"{}".format(node_id):{"port" : port, "last_seen" : datetime.datetime.now().time()}}
-            print box_info
+            timestamp = datetime.datetime.now().isoformat()
+            box_info = {"{}".format(node_id):{"port" : port, "last_seen" : timestamp}}
             self.nodes.update(box_info)
-            container = self.client.containers.run("boxbox-node:180116", ports={'3000/tcp': port}, detach=True, name="boxbox-node-{}".format(port))
+            container = self.client.containers.run("boxbox-node:180116", ports={'3000/tcp': port}, detach=True, name=node_id)
             loaded = self.wait_for_start_log(container, self.boxes[box]["start_log"], self.config["wait_load_time"])
             if loaded is "True":
                 return node_id
@@ -61,9 +61,11 @@ class Riven:
     
     def find_new_node_port(self):
         if self.nodes:
-            return max(self.nodes)+1
+            return len(self.nodes)+self.config["start_port"]
         else:
-            return 3000
+            return self.config["start_port"]
         
-    def kill_node(self,node):
-        print node
+    def kill_node(self, node):
+        container = self.client.containers.get(node)
+        container.stop()
+        self.nodes.pop(node, None)        
