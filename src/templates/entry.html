@@ -1,9 +1,0 @@
-<h2> Scan Badges </h2>
-
-<form method="POST" action="/solve">
-  {% for i in range(0,number_inputs) %}
-  {{ teams[i] }}
-  <input name="{{ teams[i] }}"></input><br/>
-  {% endfor %}
-  <input type="submit"/>
-  </form>
