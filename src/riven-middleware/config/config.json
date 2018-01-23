@@ -1,0 +1,5 @@
+{
+    "maxnodes": 10,
+    "alive_time": 20,
+    "wait_load_time": 10
+}

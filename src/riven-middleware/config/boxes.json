@@ -1,0 +1,19 @@
+{
+    "testbox1" : {
+	"platform" : "docker",
+	"container" : "boxbox-node",
+	"max-alive" : "5",
+	"startparams" : "",
+	"start_log" : "http on port",
+	"user_info" : "term : term",
+	"template" : "wetty_container.html"
+    },
+    "testbox2" : {
+	"platform" : "docker",
+	"container" : "boxbox-node",
+	"max-alive" : "5",
+	"startparams" : "",
+	"alive_time": "persist",
+	"start_log" : "http on port"
+    }
+}
