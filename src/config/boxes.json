@@ -1,19 +1,23 @@
 {
-    "testbox1" : {
+    "term" : {
 	"platform" : "docker",
-	"container" : "boxbox-node",
+	"container" : "krishnasrinivas/wetty",
 	"max-alive" : "5",
 	"startparams" : "",
 	"start_log" : "http on port",
 	"user_info" : "term : term",
-	"template" : "wetty_container.html"
+	"template" : "wetty_container.html",
+	"alive_time" : 10,
+	"internal_port" : "3000/tcp"
     },
-    "testbox2" : {
+    "vnc" : {
 	"platform" : "docker",
-	"container" : "boxbox-node",
+	"container" : "dorowu/ubuntu-desktop-lxde-vnc",
 	"max-alive" : "5",
 	"startparams" : "",
-	"alive_time": "persist",
-	"start_log" : "http on port"
+	"start_log" : "novnc entered RUNNING state",
+	"template" : "",
+	"internal_port" : "80/tcp",
+	"user_info" : "no login"
     }
 }

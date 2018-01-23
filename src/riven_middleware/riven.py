@@ -22,7 +22,11 @@ class Riven:
     def node_check(self):
         print "There are {} active containers".format(len(self.nodes))
         for node in self.nodes.copy():
-            if dateutil.parser.parse(self.nodes[node]["last_seen"]) < datetime.datetime.now()-datetime.timedelta(seconds=15):
+            if "alive_time" in self.nodes[node]:
+                alive_time = self.nodes[node]["alive_time"]
+            else:
+                alive_time=15
+            if dateutil.parser.parse(self.nodes[node]["last_seen"]) < datetime.datetime.now()-datetime.timedelta(seconds=alive_time):
                 print "{} is old. Killing Container.".format(node)
                 self.kill_node(node)
         self.schedule_node_check()
@@ -36,11 +40,11 @@ class Riven:
     def new_node(self, box):
         if box in self.boxes:
             port = self.find_new_node_port()
-            node_id = "{}{}".format(self.boxes[box]["container"], port)
+            node_id = "boxbox{}".format(port)
             timestamp = datetime.datetime.now().isoformat()
             box_info = {"{}".format(node_id):{"port" : port, "last_seen" : timestamp}}
             self.nodes.update(box_info)
-            container = self.client.containers.run("boxbox-node:180116", ports={'3000/tcp': port}, detach=True, name=node_id)
+            container = self.client.containers.run(self.boxes[box]["container"], ports={self.boxes[box]["internal_port"]: port}, detach=True, name=node_id)
             loaded = self.wait_for_start_log(container, self.boxes[box]["start_log"], self.config["wait_load_time"])
             if loaded is "True":
                 return node_id

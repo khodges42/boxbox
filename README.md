@@ -4,7 +4,7 @@
 
 ![lcomicer Riven](doc/img/riven_by_lcomicer.jpg?raw=true "Riven by lcomicer")
 
-BoxBox is a platform for providing a web API to spin up quick-and-dirty docker (and soon Kubernetes) containers, and power them down as needed.
+BoxBox is a platform for providing a web API to spin up quick-and-dirty docker (and soon Kubernetes) containers, and power them down as needed. BoxBox can run both TTY (using Wetty) or noVNC!
 
 Configuration is as simple as populating the boxes.json file with default settings for your containers. This then becomes an endpoint on the flask server. By default, the container will be powered down after the user closes their browser session.
 
@@ -29,5 +29,5 @@ Auto-Login option to docker containers
 
 Add Kubernetes Support
 
-Add VNC/RDP Support
+Add RDP Support
 

@@ -12,14 +12,19 @@ try:
 
     @app.route("/<box>")
     def index(box):
-        node_id = r.new_node(box)
-        port = r.nodes[node_id]["port"]
-        #port = r.new_node(box)
-        if port is not 0:
-            direct = "http://localhost:{}".format(port)
-            return render_template(r.boxes[box]["template"], direct=direct, user_info = r.boxes[box]["user_info"], node_id = node_id)
+        if box in r.boxes:
+            node_id = r.new_node(box)
+            port = r.nodes[node_id]["port"]
+            if port is not 0:
+                direct = "http://localhost:{}".format(port)
+                if r.boxes[box]["template"]:
+                    return render_template(r.boxes[box]["template"], direct=direct, user_info = r.boxes[box]["user_info"], node_id = node_id)
+                else:
+                    return redirect("http://localhost:{}".format(port), code=302)
+            else:
+                return "Could not load {}".format(box)
         else:
-            return "Could not load {}".format(box)
+            return "Could not find box"
 
     @socketio.on('awake')
     def is_awake(json):
